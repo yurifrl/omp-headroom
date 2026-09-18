@@ -79,6 +79,7 @@ function cfgBoolOff(yamlKey: string, envKey: string): boolean {
 
 const DEFAULT_HEADROOM_BIN = join(homedir(), ".omp", "agent", "headroom-venv", "bin", "headroom");
 export const WIDGET_PLACEMENT = process.env.OMP_HEADROOM_WIDGET_PLACEMENT || "rightEditor";
+export const WIDGET_ENABLED = cfgBoolOff("widget", "OMP_HEADROOM_WIDGET");
 
 export const PROXY_URL = (process.env.OMP_HEADROOM_URL || DEFAULT_PROXY_URL).replace(/\/+$/, "");
 export const DASHBOARD_URL = `${PROXY_URL}/dashboard`;
@@ -286,6 +287,13 @@ export const HEADROOM_SETTINGS: readonly HeadroomSetting[] = [
     kind: "string",
     def: join(dirname(VENV_DIR), "headroom-archive-stats"),
     description: "Directory for durable per-session archive counters",
+  },
+  {
+    key: "widget",
+    env: "OMP_HEADROOM_WIDGET",
+    kind: "boolean",
+    def: true,
+    description: "Show the Headroom status widget (per-session toggle: /headroom widget on|off)",
   },
 ];
 

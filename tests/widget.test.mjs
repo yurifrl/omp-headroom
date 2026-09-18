@@ -93,3 +93,77 @@ describe("provider prompt cache formatting", () => {
     expect(cacheRows[0]).toContain("cache 72% · read 72 · write 12");
   });
 });
+
+describe("widget visibility toggle", () => {
+  function harness() {
+    const fakeZod = new Proxy(function z() {}, {
+      get: () => fakeZod,
+      apply: () => fakeZod,
+    });
+    const handlers = new Map();
+    const commands = new Map();
+    const notifications = [];
+    let lastWidget;
+    let cleared = false;
+    headroomExtension({
+      zod: fakeZod,
+      setLabel() {},
+      logger: { warn() {} },
+      on(event, handler) {
+        handlers.set(event, handler);
+      },
+      registerTool() {},
+      registerCommand(name, spec) {
+        commands.set(name, spec);
+      },
+      registerFlag() {},
+    });
+    const command = commands.get("headroom");
+    const ctx = {
+      hasUI: true,
+      ui: {
+        setWidget(_key, lines) {
+          if (lines === undefined) cleared = true;
+          lastWidget = lines;
+        },
+        setStatus() {},
+        notify(message) {
+          notifications.push(message);
+        },
+      },
+    };
+    return { command, ctx, notifications, lastWidget: () => lastWidget, cleared: () => cleared };
+  }
+
+  test("hides and clears the widget for the session", async () => {
+    const h = harness();
+    await h.command.handler("widget off", h.ctx);
+    expect(h.cleared()).toBe(true);
+    expect(h.lastWidget()).toBeUndefined();
+    expect(h.notifications.join(" ")).toContain("hidden");
+  });
+
+  test("shows the widget again and renders rows", async () => {
+    const h = harness();
+    await h.command.handler("widget off", h.ctx);
+    await h.command.handler("widget on", h.ctx);
+    expect(Array.isArray(h.lastWidget())).toBe(true);
+    expect(h.notifications.join(" ")).toContain("shown");
+  });
+
+  test("bare command toggles the current session state", async () => {
+    const h = harness();
+    await h.command.handler("widget", h.ctx);
+    expect(h.cleared()).toBe(true);
+    await h.command.handler("widget", h.ctx);
+    expect(Array.isArray(h.lastWidget())).toBe(true);
+  });
+
+  test("rejects unknown arguments without touching the widget", async () => {
+    const h = harness();
+    await h.command.handler("widget maybe", h.ctx);
+    expect(h.notifications.join(" ")).toContain("Usage: /headroom widget [on|off]");
+    expect(h.lastWidget()).toBeUndefined();
+    expect(h.cleared()).toBe(false);
+  });
+});

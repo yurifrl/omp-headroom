@@ -35,6 +35,7 @@ export interface ProxyStats {
 
 export interface HeadroomState {
   enabled: boolean;
+  widgetVisible: boolean;
   proxyReady: boolean;
   proxyStarting: boolean;
   proxyProcess: ChildProcess | undefined;

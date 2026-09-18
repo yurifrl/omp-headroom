@@ -8,7 +8,7 @@
 // per-instance JSON file; the main UI session reads + sums them to render `(+N)`.
 import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { VENV_DIR } from "./config.ts";
+import { VENV_DIR, WIDGET_ENABLED } from "./config.ts";
 import type { HeadroomState } from "./types.ts";
 import { asNumber } from "./util.ts";
 
@@ -109,6 +109,7 @@ export function clearForeignFiles(): void {
 export function createHeadroomState(): HeadroomState {
   return {
     enabled: process.env.OMP_HEADROOM_DISABLED !== "1",
+    widgetVisible: WIDGET_ENABLED,
     proxyReady: false,
     proxyStarting: false,
     proxyProcess: undefined,

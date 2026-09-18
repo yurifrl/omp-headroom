@@ -2308,7 +2308,7 @@ export default function headroomExtension(pi: ExtensionAPI) {
   const UPDATE_AUTO_CLEAR_MS = 45_000;
   const headroomCommand = {
     description:
-      "Manage Headroom: stats, on, off, compact, clear, test, service, version, config, set, debug, start, stop, restart, update",
+      "Manage Headroom: stats, on, off, widget, compact, clear, test, service, version, config, set, debug, start, stop, restart, update",
     getArgumentCompletions: (prefix) => completeHeadroomCommand(prefix, HEADROOM_TEST_SURFACES),
     handler: async (args, ctx) => {
       const parts = String(args || "")
@@ -2324,6 +2324,21 @@ export default function headroomExtension(pi: ExtensionAPI) {
       } else if (action === "off") {
         state.enabled = false;
         ctx.ui.notify("Headroom disabled for this session.", "info");
+      } else if (action === "widget") {
+        const arg = sub.trim().toLowerCase();
+        if (arg === "on" || arg === "off") {
+          state.widgetVisible = arg === "on";
+        } else if (!arg) {
+          state.widgetVisible = !state.widgetVisible;
+        } else {
+          ctx.ui.notify("Usage: /headroom widget [on|off]", "warn");
+          return;
+        }
+        renderWidget(ctx, state);
+        ctx.ui.notify(
+          `Headroom widget ${state.widgetVisible ? "shown" : "hidden"} for this session (config default reapplies next start).`,
+          "info",
+        );
       } else if (action === "compact") {
         await runHeadroomCompaction(ctx, state);
       } else if (action === "clear") {

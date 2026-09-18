@@ -116,6 +116,11 @@ export function localCompressionLine(state: HeadroomState): string {
 
 export function renderWidget(ctx: HeadroomCtx, state: HeadroomState): void {
   if (!ctx?.hasUI) return;
+  if (state.widgetVisible === false) {
+    ctx.ui?.setWidget?.(EXTENSION_KEY, undefined, { placement: WIDGET_PLACEMENT as never });
+    ctx.ui?.setStatus?.(EXTENSION_KEY, undefined);
+    return;
+  }
   const ready = state.enabled && state.proxyReady;
   // Rainbow + dashboard link IS the "ready" cue; when not ready the title goes
   // gray and the problem (truncated) rides next to it in the border.

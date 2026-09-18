@@ -14,6 +14,7 @@ export const SUBCOMMANDS: readonly HeadroomSubcommand[] = [
   { label: "stats", description: "Show compression stats (proxy, archive, CCR)" },
   { label: "on", description: "Enable Headroom for this session" },
   { label: "off", description: "Disable Headroom for this session" },
+  { label: "widget", description: "Show or hide the status widget for this session (on|off)" },
   { label: "compact", description: "Run OMP semantic compaction with a Headroom CCR archive" },
   { label: "clear", description: "Clear current-session CCR archives and archive counters" },
   {
